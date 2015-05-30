@@ -70,15 +70,26 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
       };
 
       $scope.refreshConditions();
+      $scope.test = function(){
+        console.log("da");
+      }
+      $scope.test2 = function(){
+        console.log('da2');
+      }
       
-      paper.on('cell:pointerdown', function(cellView, evt, x, y) {         
-        
+      paper.on('cell:pointerdown', function(cellView, evt, x, y) {        
         if (cellView.model.toJSON().umlType == "Class"){
           var className = evt.target.parentNode.getAttribute('class');
           $scope.statusClass = true;
-          if (className == 'element-tool-remove'){
-             curClass = cellView.model.toJSON().id;
-             $scope.deleteClass();
+          if (className == 'element-tool-remove') {           
+            curClass = cellView.model.toJSON().id;
+            $scope.deleteClass();
+            $scope.className = {};
+            $scope.classMethods = [];
+            $scope.classAttributes = [];
+            $scope.showClassProperties.condition = false;
+            $scope.$apply();
+            return;
           }
           if ($scope.referenceCondition == true) {
             if (!$scope.source) {            
@@ -86,7 +97,7 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
             }
             else if ($scope.source) {
               $scope.target = cellView.model.toJSON().id;            
-              if ($scope.source != $scope.target){
+              if ($scope.source != $scope.target) {
                 switch (true) {
                   case $scope.associationCondition:
                     var assosiation = new uml.Association({
@@ -122,7 +133,7 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
               }
               else {              	
                	notify({
-		            message: "на данный момент такая связь не предусмотренна",		            
+		            message: "на данный момент такая связь не предусмотрена",		            
 		            templateUrl: '',
 		            position: 'right',
 		            classes: "alert-danger",
@@ -139,12 +150,20 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
           $scope.className = { 
             name: cellView.model.toJSON().name
           };
+          console.log(cellView.model.toJSON());
+           $scope.size = {
+            width: cellView.model.toJSON().size.width,
+            height: cellView.model.toJSON().size.height
+          }
+         
+          
           $scope.showClassProperties.condition = true;            
           $scope.typesInit();
+          $scope.$apply();
         }        
       });      
 
-      paper.on('blank:pointerclick', function(evt, xPosition, yPosition) {        
+      paper.on('blank:pointerdown', function(evt, xPosition, yPosition) {        
       	$scope.showClassProperties.condition = false;      	
         switch (true) {
           case $scope.classCondition:            
@@ -183,13 +202,20 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
           $scope.showClassProperties.condition = true;   
           $scope.className = {name: "NewClass"};
           $scope.classMethods = [];
-          $scope.classAttributes = [];          
-          $scope.typesInit();                   
+          $scope.classAttributes = [];
+          $scope.typesInit();
+          $scope.size = {
+            width: "100",
+            height: "150"
+          }
+                  
+          $scope.$apply();                  
         }                            
       });
             
-      $scope.changeSize = function(width, height){      	
-      	classes[curClass].resize(width, height);      	
+      $scope.changeSize = function(){      
+           	
+      	classes[curClass].resize($scope.size.width, $scope.size.height);      	
       }
       $scope.deleteClass = function() {        
         classes[curClass].remove();             
@@ -199,7 +225,8 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
         $scope.className = {};
         $scope.classMethods = [];
         $scope.classAttributes = [];
-        $scope.showClassProperties.condition = false;          
+        $scope.showClassProperties.condition = false;
+        console.log($scope.className);          
       }
 
       $scope.changeClassDetails = function() {

@@ -7,7 +7,7 @@
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 	    <link href="css/stylish-portfolio.css" rel="stylesheet">
 	    <link rel="stylesheet" href="css/font-awesome.css">
-	    <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+	    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 	    <link rel="stylesheet" href="css/joint.css" />
 	 	<link rel="stylesheet" type="text/css" href="angular-modules/angular-notify/angular-notify.css">     	 	
 	 	<link rel="stylesheet" type="text/css" href="css/app.css">	
@@ -59,7 +59,7 @@
         				</button>
         				<button class="btn generalization" ng-click="refreshConditions();generalizationCondition=true;referenceCondition=true">
         					Generalization	
-        				</button>        				          				
+        				</button>        				      				          				
         			</div>
         		</div>
         		<div class="paper-container" ng-click ng-class="{iconClass: classCondition, iconAbstract: abstractCondition, iconInterface: interfaceCondition, iconAssosiation: associationCondition, iconComposition: compositionCondition, iconGenetalization: generalizationCondition}">
@@ -83,21 +83,21 @@
 						    		<label for="width">
 						    			Ширина: 
 						    			<span class="pull-right">
-						    				<span ng-bind="width" ng-init="width=110" class="ng-binding"></span> 
+						    				<span ng-bind="size.width"  class="ng-binding"></span> 
 						    			</span>
 						    		</label>
-						    		<input type="range" ng-change="changeSize(width, height)" ng-model="width" min="110" max="500" step="10" style="width: 140px" class="ng-valid ng-dirty">
+						    		<input type="range" ng-change="changeSize()" ng-model="size.width" min="110" max="500" step="10" style="width: 140px" class="ng-valid ng-dirty">
 						    		<label for="height">
 						    			Высота: 
 						    			<span class="pull-right">
-						    				<span ng-bind="height" ng-init="height=100" class="ng-binding"></span> 
+						    				<span ng-bind="size.height"  class="ng-binding"></span> 
 						    			</span>
 						    		</label>
-						    		<input type="range" ng-model="height" ng-change="changeSize(width, height)" min="110" max="500" step="10" style="width: 140px" class="ng-valid ng-dirty">
+						    		<input type="range" ng-model="size.height" ng-change="changeSize()" min="110" max="500" step="10" style="width: 140px" class="ng-valid ng-dirty">
 						    	</div>						    	
 						    </div>
 						    <div ng-show="!showClassProperties.condition">
-						    	<p style="padding: 10px 0px 0px 40px;">{{showClassProperties.message }}</p>
+						    	<p style="padding: 10px 0px 0px 40px;" ng-bind="showClassProperties.message"></p>
 						    </div>
 						    					        
 						</accordion-group>
@@ -125,7 +125,7 @@
 								</div>			
 						    </div>
 						     <div ng-show="!showClassProperties.condition">
-						    	<p style="padding: 10px 0px 0px 40px;">{{showClassProperties.message }}</p>
+						    	<p style="padding: 10px 0px 0px 40px;" ng-bind="showClassProperties.message"></p>
 						    </div>
 						</accordion-group>
 						<accordion-group is-open="statusMethod">
@@ -168,7 +168,7 @@
 								</div>
 						    </div>
 						    <div ng-show="!showClassProperties.condition">
-						    	<p style="padding: 10px 0px 0px 40px;">{{showClassProperties.message }}</p>
+						    	<p style="padding: 10px 0px 0px 40px;" ng-bind="showClassProperties.message"></p>
 						    </div>
 						</accordion-group>				    			   
 	  				</accordion>
