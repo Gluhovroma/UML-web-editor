@@ -5,12 +5,14 @@ angular.module('umlEditorApp').service('XMIService', function (notify){
         var eClasses = [];
         var classes = [];
         var references = [];    
-        var superTypes = [];   
+        var superTypes = [];
+        // пробегаемся по всем элементам диаграммы, заполняем eClasses, classes, references, superTypes   
         _.each(diagramElements, function(object) {              
               switch (true) {
                 case (object.type == "uml.Class"):
                   classes.push(object);            
                   eClasses[object.id] = Ecore.EClass.create({ name: object.name });
+                  //добавляем атрибуты
                   _.each(object.attributes, function(attribute) {                                         
                     var atr =  Ecore.EAttribute.create({ 
                                                         name: attribute.name, 
@@ -25,6 +27,7 @@ angular.module('umlEditorApp').service('XMIService', function (notify){
                                                             name: object.name, 
                                                             interface: true
                                                           });
+                  //добавляем атрибуты
                   _.each(object.attributes, function(attribute) {                        
                     var atr =  Ecore.EAttribute.create({ 
                                                         name: attribute.name, 
@@ -39,6 +42,7 @@ angular.module('umlEditorApp').service('XMIService', function (notify){
                                                               name: object.name, 
                                                               abstract: true
                                                             });
+                  //добавляем атрибуты
                   _.each(object.attributes, function(attribute){                        
                     var atr =  Ecore.EAttribute.create({ 
                                                         name: attribute.name, 
@@ -58,7 +62,7 @@ angular.module('umlEditorApp').service('XMIService', function (notify){
                   break;                   
             }                  
         });             
-       
+       	// если диаграмма не пустая
         if (classes.length != 0) {
           var p = Ecore.EPackage.create({
             name: 'p',
@@ -67,11 +71,13 @@ angular.module('umlEditorApp').service('XMIService', function (notify){
           });
           var source;
           var target;
+          // добавляем связь наследования
           _.each(superTypes, function(superType) {
               source = superType.source.id;
               target = superType.target.id;
               eClasses[source].get("eSuperTypes").add(eClasses[target]);
             });
+          // добавляем остальные связи
           _.each(references, function(reference) {
               console.log(reference);
               source = reference.source.id;
@@ -85,6 +91,7 @@ angular.module('umlEditorApp').service('XMIService', function (notify){
                 eClasses[source].get('eStructuralFeatures').add(reference);
               } 
             });
+          // добавляем методы и параметры
           _.each(classes, function(object) {
             if (object.methods.length != 0) {
                 _.each(object.methods, function(method) {                    

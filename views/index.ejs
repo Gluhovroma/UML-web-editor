@@ -1,6 +1,5 @@
 <html ng-app="umlEditorApp" lang="en">
   	<head>
-
   		<title>UML-editor</title>
   		<meta charset='utf-8'><meta http-equiv='Content-Type'>
   		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">	    
@@ -10,11 +9,9 @@
 	    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 	    <link rel="stylesheet" href="css/joint.css" />
 	 	<link rel="stylesheet" type="text/css" href="angular-modules/angular-notify/angular-notify.css">     	 	
-	 	<link rel="stylesheet" type="text/css" href="css/app.css">	
-	    <script src="js/libs/jquery-1.11.3.min.js"></script>	    
+	 	<link rel="stylesheet" type="text/css" href="css/app.css">	    	    
 	    <script src="js/libs/angular.min.js"></script>	    
-	    <script src="js/libs/underscore.js"></script>
-	    <script src="js/libs/backbone.js"></script>
+	    <script src="js/libs/underscore.js"></script>	   
 		<script src="js/libs/sax.js"></script>
 		<script src="js/libs/ecore.xmi.js"></script>
 		<script src="js/libs/joint.js"></script>					 	 	
@@ -68,10 +65,10 @@
         		<div class="clearfix"></div>
         		<div class="accordion-container">
 	        		<accordion close-others="oneAtATime"> 
-		        		<accordion-group is-open="statusClass">
+		        		<accordion-group is-open="statusClassNameOpen ">
 						    <accordion-heading>
 						        Класс
-						        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusClass, 'glyphicon-chevron-right': !statusClass}">						        	
+						        <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusClassNameOpen, 'glyphicon-chevron-right': !statusClassNameOpen }">						        	
 						        </i>
 						    </accordion-heading>
 						    <div ng-show="showClassProperties.condition">

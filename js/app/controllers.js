@@ -11,29 +11,32 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
   		        classes: '',
   		        duration: 5000
         	  }); 
-
+	  // инициализируем joint.dia.Graph (коллекцию все моделей диаграммы)
       var graph = new joint.dia.Graph;
+      // инициализируем joint.dia.Paper (представление для всех элементов диаграммы)
       var paper = new joint.dia.Paper({
-          el: $('#paper'),
+          el: $('#paper'), // привязываем к контретному элементу страницы
           width: 2000,
           height: 2000,
           gridSize: 5,
           model: graph
       });
-      paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
 
+      // объявляем переменную для шаблонов uml
       var uml = joint.shapes.uml;
-
+      // объявляем переменную, которая будет хранить текущий выбранный класс (для последующего его обновления)
       var curClass = {};
-
-      var classes = {};
-      var relations = [];
-
+      // объявляем объект, который будет хранить все классы диаграммы
+      var classes = {};      
+      // переменная для закрытия DOM элементов для работы с классом
       $scope.showClassProperties = {
       	condition: false,
       	message: "Элемент не выбран"
       };
       
+      // событие скрола мышки
+      paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
+
       function onMouseWheel(e) {      	
   	    e.preventDefault();
   	    e = e.originalEvent;	    
@@ -55,9 +58,8 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
   		    return pointTransformed;
   		  }
 	   }		
-
-      $scope.refreshConditions = function(){
-      	
+	   // функция сброса всех условий выбора
+      $scope.refreshConditions = function(){      	
         $scope.classCondition = false;
         $scope.interfaceCondition = false;
         $scope.abstractCondition = false;
@@ -70,17 +72,13 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
       };
 
       $scope.refreshConditions();
-      $scope.test = function(){
-        console.log("da");
-      }
-      $scope.test2 = function(){
-        console.log('da2');
-      }
       
+      // событие клика на элемент диаграммы
       paper.on('cell:pointerdown', function(cellView, evt, x, y) {        
         if (cellView.model.toJSON().umlType == "Class"){
           var className = evt.target.parentNode.getAttribute('class');
-          $scope.statusClass = true;
+          $scope.statusClassNameOpen  = true;
+          // если кликнули на svg элемент удаления класса
           if (className == 'element-tool-remove') {           
             curClass = cellView.model.toJSON().id;
             $scope.deleteClass();
@@ -91,13 +89,16 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
             $scope.$apply();
             return;
           }
+          // если перед кликом была выбрана связь
           if ($scope.referenceCondition == true) {
+          	// если это первый класс для связи
             if (!$scope.source) {            
               $scope.source = cellView.model.toJSON().id;            
             }
-            else if ($scope.source) {
+            else {
               $scope.target = cellView.model.toJSON().id;            
               if ($scope.source != $scope.target) {
+              	// switch для создания связей
                 switch (true) {
                   case $scope.associationCondition:
                     var assosiation = new uml.Association({
@@ -143,154 +144,89 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
                 $scope.refreshConditions();
               }
             }        
-          }        
+          }
+          //присваиваем текущий класс        
           curClass = cellView.model.toJSON().id;
+          // инициалириуем элементы для работы с классом
           $scope.classMethods = cellView.model.toJSON().methods;
           $scope.classAttributes = cellView.model.toJSON().attributes;
           $scope.className = { 
             name: cellView.model.toJSON().name
           };
-          console.log(cellView.model.toJSON());
+          
            $scope.size = {
             width: cellView.model.toJSON().size.width,
             height: cellView.model.toJSON().size.height
-          }
-         
-          
+          }         
           $scope.showClassProperties.condition = true;            
-          $scope.typesInit();
+          typesInit();
           $scope.$apply();
         }        
       });      
-
-      paper.on('blank:pointerdown', function(evt, xPosition, yPosition) {        
-      	$scope.showClassProperties.condition = false;      	
+	  // событие клика на пустую область диаграммы
+      paper.on('blank:pointerdown', function(evt, xPosition, yPosition) {
+      	// закрываем DOM элементы для работы с классом        
+      	$scope.showClassProperties.condition = false;
+      	// switch для создания класса      	
         switch (true) {
           case $scope.classCondition:            
-            var newClass = new uml.Class();               
-            classes[newClass.id] = newClass;          
+            var newClass = new uml.Class();
+            //добавляем новый класс в объект с классами               
+            classes[newClass.id] = newClass;
+            //функция инициализации класса          
             classInit();
             $scope.classCondition = false;
-            $scope.statusClass = true; 
+            $scope.statusClassNameOpen  = true; 
             break;
           case $scope.interfaceCondition:
             var newClass = new uml.Interface();
-            classes[newClass.id] = newClass; 
+            //добавляем новый класс в объект с классами 
+            classes[newClass.id] = newClass;
+            //функция инициализации класса   
             classInit(); 
             $scope.interfaceCondition = false;
-            $scope.statusClass = true;
+            $scope.statusClassNameOpen = true;
             break;
           case $scope.abstractCondition:
             var newClass = new uml.Abstract();
+            //добавляем новый класс в объект с классами 
             classes[newClass.id] = newClass;
+            //функция инициализации класса   
             classInit(); 
             $scope.abstractCondition = false;
-            $scope.statusClass = true;
+            $scope.statusClassNameOpen  = true;
             break;
           case $scope.referenceCondition:
             $scope.refreshConditions();            
             break;
         }
-        function classInit() {         
+
+        function classInit() {
+          //добавляем необходимые атрибуты классу         
           classes[newClass.id].attributes.position = { x:xPosition  , y: yPosition};
           classes[newClass.id].attributes.size= { width: 150, height: 100 };
           classes[newClass.id].setClassName("NewClass");
           classes[newClass.id].attributes.attributes = [];
-          classes[newClass.id].attributes.methods = [];                   
-          graph.addCell(classes[newClass.id]);        
+          classes[newClass.id].attributes.methods = [];
+          //добавляем новый класс в коллекция элементов                   
+          graph.addCell(classes[newClass.id]);
+          //присваиваем текущий класс          
           curClass = newClass.id;
+          // инициалириуем DOM элементы  для работы с классом
           $scope.showClassProperties.condition = true;   
           $scope.className = {name: "NewClass"};
           $scope.classMethods = [];
           $scope.classAttributes = [];
-          $scope.typesInit();
+          typesInit();
           $scope.size = {
-            width: "100",
-            height: "150"
-          }
-                  
+            width: "150",
+            height: "100"
+          }                  
           $scope.$apply();                  
         }                            
       });
-            
-      $scope.changeSize = function(){      
-           	
-      	classes[curClass].resize($scope.size.width, $scope.size.height);      	
-      }
-      $scope.deleteClass = function() {        
-        classes[curClass].remove();             
-        delete classes[curClass];        
-        console.log(graph.toJSON().cells);
-        console.log(classes);
-        $scope.className = {};
-        $scope.classMethods = [];
-        $scope.classAttributes = [];
-        $scope.showClassProperties.condition = false;
-        console.log($scope.className);          
-      }
-
-      $scope.changeClassDetails = function() {
-        classes[curClass].setClassName($scope.className.name);        
-        $scope.updateAttributes(); 
-        $scope.updateMethods();
-
-      };
-
-      $scope.addAtr = function() {
-        newAttribute = {
-          name: "New attribute",
-          type: null
-        };
-        $scope.classAttributes.push(newAttribute);        
-        $scope.updateAttributes();        
-      };
-
-      $scope.deleteAtr = function(index) {        
-        $scope.classAttributes.splice(index, 1);        
-        $scope.updateAttributes();        
-      };
-
-      $scope.addMethod = function(){
-        newMethod = {
-          name: "NewMethod",
-          type: "Void",
-          parameters: []
-        };
-        $scope.classMethods.push(newMethod);                   
-        $scope.updateMethods();
-      };
-
-      $scope.deleteMethod = function(index){              
-        $scope.classMethods.splice(index, 1);                
-        $scope.updateMethods(); 
-      }
-
-      $scope.addParam = function(index) {
-        newParam = {
-          name: "NewParam",
-          type: null
-        };
-        $scope.classMethods[index].parameters.push(newParam);            
-        $scope.updateMethods();
-      }
-
-      $scope.deleteParam = function(index, parent) {
-        $scope.classMethods[parent.$index].parameters.splice(index, 1);            
-        $scope.updateMethods();
-      };
-      
-      $scope.exportXMI = function(){
-        var content = XMIService.export(graph.toJSON().cells);
-        if (content){
-          var blob = new Blob([content], { type: 'text/plain' });
-          var downloadLink = angular.element('<a></a>');
-          downloadLink.attr('href',window.URL.createObjectURL(blob));
-          downloadLink.attr('download', 'diagram.xmi');
-          downloadLink[0].click();         
-          downloadLink = undefined;
-        }
-      }
-      $scope.typesInit = function() {
+	  // функция инициализирующая типы: types, methodTypes и typesWithClasses
+      function typesInit() {
         $scope.types = [ 
           "String", 
           "Int", 
@@ -316,8 +252,72 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
           });
         };     
       };
+      // изменение размеров класса
+      $scope.changeSize = function(){           	
+      	classes[curClass].resize($scope.size.width, $scope.size.height);      	
+      }
+      // удаление класса
+      $scope.deleteClass = function() {        
+        classes[curClass].remove();             
+        delete classes[curClass];       
+        $scope.className = {};
+        $scope.classMethods = [];
+        $scope.classAttributes = [];
+        $scope.showClassProperties.condition = false;
+                 
+      }
+      // изменение имени, методов или атрибутов класса
+      $scope.changeClassDetails = function() {
+        classes[curClass].setClassName($scope.className.name);        
+        updateAttributes(); 
+        updateMethods();
 
-      $scope.updateAttributes = function(){
+      };
+      // добавление атрибута
+      $scope.addAtr = function() {
+        newAttribute = {
+          name: "Newattribute",
+          type: null
+        };
+        $scope.classAttributes.push(newAttribute);        
+        updateAttributes();        
+      };
+      // удаление атрибуты
+      $scope.deleteAtr = function(index) {        
+        $scope.classAttributes.splice(index, 1);        
+        updateAttributes();        
+      };
+      // добавление метода
+      $scope.addMethod = function(){
+        newMethod = {
+          name: "NewMethod",
+          type: "Void",
+          parameters: []
+        };
+        $scope.classMethods.push(newMethod);                   
+        updateMethods();
+      };
+      // удаление метода
+      $scope.deleteMethod = function(index){              
+        $scope.classMethods.splice(index, 1);                
+        updateMethods(); 
+      }
+      // добавление параметра
+      $scope.addParam = function(index) {
+        newParam = {
+          name: "NewParam",
+          type: null
+        };
+        $scope.classMethods[index].parameters.push(newParam);            
+        updateMethods();
+      }
+      // удаление параметра
+      $scope.deleteParam = function(index, parent) {
+        $scope.classMethods[parent.$index].parameters.splice(index, 1);            
+        updateMethods();
+      };      
+      // функция обновления арибутов у элемента диаграммы
+      function updateAttributes(){
         var attributes = []; 
         classes[curClass].attributes.attributes=$scope.classAttributes;               
         _.each($scope.classAttributes, function(attribute) {
@@ -329,8 +329,8 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
         });
         classes[curClass].setAttrs(attributes);
       };
-
-      $scope.updateMethods = function(){
+      // функция обновления методов у элемента диаграммы
+      function updateMethods(){
         var methods = [];
         classes[curClass].attributes.methods = $scope.classMethods;             
         _.each($scope.classMethods, function(method){
@@ -356,6 +356,19 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
         });        
         classes[curClass].setMethods(methods);
       };
+      // экспорт xmi
+	  $scope.exportXMI = function(){
+	  	// вызываем сервис XMIService, передаем в него все элементы диаграммы, возвратит XMI в строке
+        var content = XMIService.export(graph.toJSON().cells);
+        if (content){
+          var blob = new Blob([content], { type: 'text/plain' });
+          var downloadLink = angular.element('<a></a>');
+          downloadLink.attr('href',window.URL.createObjectURL(blob));
+          downloadLink.attr('download', 'diagram.xmi');
+          downloadLink[0].click();         
+          downloadLink = undefined;
+        }
+      }
 
 	});
 	
