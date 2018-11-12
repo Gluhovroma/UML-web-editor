@@ -16,8 +16,8 @@ angular.module('umlEditorApp', ['ui.bootstrap','cgNotify']);
       // инициализируем joint.dia.Paper (представление для всех элементов диаграммы)
       var paper = new joint.dia.Paper({
           el: $('#paper'), // привязываем к контретному элементу страницы
-          width: 2000,
-          height: 2000,
+          width: 900,
+          height: 600,
           gridSize: 5,
           model: graph
       });
